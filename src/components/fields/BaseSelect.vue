@@ -1,29 +1,43 @@
 <template>
-  <label v-if="label" :for="uuid">{{ label }}</label>
-  <input
-    class="form-control"
+  <label v-if="label" :for="uuid">
+    {{ label }}
+  </label>
+  <select
+    class="form-select"
     v-bind="{
       ...$attrs,
-      onInput: updateValue,
+      onChange: updateValue,
     }"
-    :id="uuid"
     :value="modelValue"
-    :placeholder="label"
+    :id="uuid"
     :aria-describedby="error ? `${uuid}-error` : null"
     :aria-invalid="error ? true : false"
     :class="{ error }"
-  />
-  <BaseErrorMessage v-if="error" :id="`${uuid}-error`">{{
-    error
-  }}</BaseErrorMessage>
+  >
+    <option
+      v-for="option in options"
+      :value="option"
+      :key="option"
+      :selected="option === modelValue"
+    >
+      {{ option }}
+    </option>
+  </select>
+  <BaseErrorMessage v-if="error" :id="`${uuid}-error`">
+    {{ error }}
+  </BaseErrorMessage>
 </template>
 
 <script setup>
   import SetupFormComponent from '../../features/SetupFormComponent';
   import UniqueID from '../../features/UniqueID';
-  import BaseErrorMessage from './BaseErrorMessage.vue';
+  import BaseErrorMessage from '../fields/BaseErrorMessage.vue';
 
   const props = defineProps({
+    options: {
+      type: Array,
+      required: true,
+    },
     label: {
       type: String,
       default: '',
@@ -34,7 +48,6 @@
     },
     modelValue: {
       type: [String, Number],
-      default: '',
     },
   });
   const emit = defineEmits(['update:modelValue']);
